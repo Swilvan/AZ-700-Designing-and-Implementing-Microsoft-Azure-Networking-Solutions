@@ -1,0 +1,85 @@
+Azure Virtual Network (VNet)
+
+	fundamental building block. Logical isolation of Azure cloud dedicated to subscription. Used to manage VPN's and optionally connect to other VNets or on prem infra. Each vnet has its own CIDR block.
+
+----------------------------------------------------
+CIDR (Classless inter domain routing block
+
+	Method for assigning IP adresses. Ip address block allocation. 
+
+Traditionally ip address classes used for address assignment. 
+Class 
+	A = 1.x.x.x to 126.x.x.x
+	B = 128.0.x.x to 191.255.x.x
+	C = 192.0.0.x to 223.255.255.x
+	D = 224.0.0.0 to 239.255.255.255 used for multicasting
+	E = 240.0.0.0 to 255.255.255.254 used for R&D
+
+Host addresses we use IP's in A, B, C.
+
+CIDR block contains ip addresses. And the following rule
+
+	Rule 1: In the CIDR block, the IP addresses which are allocated to the hosts should be continuous.
+
+	Rule 2: The size of the block should be of power 2 and should be equal to the total number of IP addresses.
+
+	Rule 3: The size of the block must be divisible by the first IP address of the block.
+
+Notation: a.b.c.d / n where n is # network bits
+
+----------------------------------------------------
+
+Capabilities
+
+Resources in VNets can by default communicate outbound to the internet, inbound through public ip or public load balancer (these can also be used for outbound communication). Azure resources can communicate through VNets, VNet Service endpoints and Vnet peering. VNets connect everything from vms though app service environment, AKS and scale sets. Service endpoints are used for other resource types such as Azure SQL databses and storage accounts.
+
+On premises resources can use VNets through P2S vpn, s2s vpn & Azure Expressroute. 
+
+Filter network traffic between subnets using firewalls, gateways, proxies & Network Address Translation (NAT) services.
+
+Implement route tables or border gateway protocol (BGP) to override the defaults in Azure.
+
+----------------------------------------------------
+Address space & subnets 
+
+VNet address space should be 10.0.0.0 - 10.255.255.255 (10/8), 172.16.0.0 - 172.31.255.255 (172.16/12) or 192.168.0.0 - 192.168.255.255 192.168/16
+
+Reserved: 
+
+    224.0.0.0/4 (Multicast)
+    255.255.255.255/32 (Broadcast)
+    127.0.0.0/8 (Loopback)
+    169.254.0.0/16 (Link-local)
+    168.63.129.16/32 (Internal DNS)
+
+Azure reserves 5 ip addresses in each subnet. x.x.x.0 Network address, x.x.x.1 Reserved by azure for default gateway. x.x.x.2,3 maps Azure DNS IPs to VNet space. x.x.x.255 Network broadcast address.
+
+Ensure non overlapping address space?
+Security isolation?
+Mitigate IP addressing limitations?
+Connections between on prem/ VNet?
+Using Azure services that create their own VNets?
+
+	 - Subnet - IP V4 size /29 to /2
+VNet - Subnet - IP V6 sieze /64
+	 - Subnet 	
+	 
+Subnets should have unique address ranges (defined in CIDR). Certain Azure services require their own. Limit access using service endpoints. Can be used to route traffic through a network virtual appliance.
+	Further segment using Network Security Groups (NSG's)
+	
+Naming Conventions
+
+Suggested: ResourceType-Application-Environment-AzureRegion-Instance: pip-sharepoint-prod-westus-001 (pip -> private endpoint)
+
+----------------------------------------------------
+
+All azure resources are in an Azure region/subscription. A resource can only be in a vnet in the same region/subscription. Multiple VNets spanning multiple regions/subscriptions can be connected.
+
+Availability
+
+    Zonal services: Resources can be pinned to a specific zone. For example, virtual machines, managed disks, or standard IP addresses can be pinned to a specific zone, which allows for increased resilience by having one or more instances of resources spread across zones.
+    Zone-redundant services: Resources are replicated or distributed across zones automatically. Azure replicates the data across three zones so that a zone failure does not impact its availability.
+    Non-regional services: Services are always available from Azure geographies and are resilient to zone-wide outages as well as region-wide outages.
+
+
+
